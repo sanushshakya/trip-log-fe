@@ -8,17 +8,15 @@ import dynamic from "next/dynamic";
 import { useAuth } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { TripCard } from "@/components/trips/TripCard";
-import { LogCard } from "@/components/logs/LogCard"; // LogCard is now simpler
+import { LogCard } from "@/components/logs/LogCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
-// Use the corrected service names from your api.ts
 import { tripService, logSheet } from "@/lib/api";
-import { DailyLog, TripPlanResponse, Trip } from "@/lib/types"; // Import Trip for derived data
+import { DailyLog, TripPlanResponse, Trip } from "@/lib/types";
 import { Plus, Search, Loader2 } from "lucide-react";
 
-// A loader component for a better user experience while the map itself is loading
 const MapLoader = () => (
   <div className="flex h-[500px] w-full items-center justify-center rounded-lg bg-gray-50">
     <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
@@ -26,7 +24,6 @@ const MapLoader = () => (
   </div>
 );
 
-// Renamed to avoid conflict with the built-in Map object
 const MapDisplay = dynamic(() => import("@/components/maps"), {
   ssr: false,
   loading: () => <MapLoader />,
@@ -36,27 +33,20 @@ export default function Dashboard() {
   const { isAuthenticated, loading: authLoading } = useAuth();
   const router = useRouter();
 
-  // --- State is now much simpler ---
-  // The primary source of data is the logs array.
   const [logs, setLogs] = useState<DailyLog[]>([]);
   const [logsLoading, setLogsLoading] = useState(true);
   const [logsError, setLogsError] = useState("");
 
-  // State for filtering and search
   const [tripSearchTerm, setTripSearchTerm] = useState("");
   const [logSearchTerm, setLogSearchTerm] = useState("");
 
-  // State for the map plan remains the same
   const [tripPlan, setTripPlan] = useState<TripPlanResponse | null>(null);
   const [isPlanLoading, setIsPlanLoading] = useState(false);
 
-  // --- Simplified Data Loading ---
   useEffect(() => {
-    // Only need to fetch logs, as they contain all trip data.
     const loadInitialData = async () => {
       try {
         setLogsLoading(true);
-        // Use the correct service name
         const logsData = await logSheet.getLogs();
         setLogs(logsData);
       } catch (err) {
@@ -100,15 +90,10 @@ export default function Dashboard() {
     );
   }, [uniqueTrips, tripSearchTerm]);
 
-  // Filter logs based on search term
   const filteredLogs = useMemo(() => {
-    return logs.filter((log) =>
-      // Correctly filter by the trip ID within the nested trip object
-      log.trip.id.toString().includes(logSearchTerm)
-    );
+    return logs.filter((log) => log.trip.id.toString().includes(logSearchTerm));
   }, [logs, logSearchTerm]);
 
-  // --- Functions ---
   const handleGeneratePlan = async (tripId: number) => {
     setTripPlan(null);
     setIsPlanLoading(true);
@@ -134,7 +119,6 @@ export default function Dashboard() {
   return (
     <ProtectedRoute>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
-        {/* Trips Section (Powered by derived data) */}
         <div>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <h1 className="text-3xl font-bold text-gray-900">Trip Dashboard</h1>
@@ -167,14 +151,12 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Map Display Section */}
         {tripPlan && (
           <div className="mt-8">
             <MapDisplay plan={tripPlan} />
           </div>
         )}
 
-        {/* Logs Section (The primary data source) */}
         <div>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <h1 className="text-3xl font-bold text-gray-900">Driver Logs</h1>
@@ -202,9 +184,7 @@ export default function Dashboard() {
             </Alert>
           )}
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mt-6">
-            {/* The LogCard loop is now extremely simple */}
             {filteredLogs.map((log) => (
-              // No more mapping or lookups needed. The LogCard gets all the data it needs from the log object.
               <LogCard key={log.id} log={log} />
             ))}
           </div>
