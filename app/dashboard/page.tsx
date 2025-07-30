@@ -43,6 +43,8 @@ export default function Dashboard() {
   const [tripPlan, setTripPlan] = useState<TripPlanResponse | null>(null);
   const [isPlanLoading, setIsPlanLoading] = useState(false);
 
+  const [isLogModalOpen, setIsLogModalOpen] = useState(false);
+
   useEffect(() => {
     const loadInitialData = async () => {
       try {
@@ -61,23 +63,18 @@ export default function Dashboard() {
     loadInitialData();
   }, []);
 
-  // Effect to handle auth redirection
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       router.push("/");
     }
   }, [isAuthenticated, authLoading, router]);
 
-  // --- Derived Data using useMemo for Performance ---
-  // Create a unique list of trips from the logs data.
-  // useMemo ensures this only recalculates when the logs array changes.
   const uniqueTrips: Trip[] = useMemo(() => {
     return Array.from(
       new Map(logs.map((log) => [log.trip.id, log.trip])).values()
     );
   }, [logs]);
 
-  // Filter trips based on search term
   const filteredTrips = useMemo(() => {
     return uniqueTrips.filter(
       (trip) =>
@@ -107,6 +104,10 @@ export default function Dashboard() {
       setIsPlanLoading(false);
     }
   };
+
+  // Functions to handle modal state
+  const handleOpenLogModal = () => setIsLogModalOpen(true);
+  const handleCloseLogModal = () => setIsLogModalOpen(false);
 
   if (authLoading || logsLoading) {
     return (
@@ -152,7 +153,7 @@ export default function Dashboard() {
         </div>
 
         {tripPlan && (
-          <div className="mt-8">
+          <div className="mt-8 relative z-0">
             <MapDisplay plan={tripPlan} />
           </div>
         )}
@@ -160,10 +161,8 @@ export default function Dashboard() {
         <div>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <h1 className="text-3xl font-bold text-gray-900">Driver Logs</h1>
-            <Button asChild>
-              <Link href="/logs/create">
-                <Plus className="h-4 w-4 mr-2" /> New Log
-              </Link>
+            <Button onClick={handleOpenLogModal}>
+              <Plus className="h-4 w-4 mr-2" /> New Log
             </Button>
           </div>
           <div className="mt-6 max-w-md">
@@ -190,6 +189,17 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+      {isLogModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md">
+            <h2 className="text-2xl font-bold mb-4">Create New Log</h2>
+            <p>Log creation form...</p>
+            <Button onClick={handleCloseLogModal} className="mt-6">
+              Close
+            </Button>
+          </div>
+        </div>
+      )}
     </ProtectedRoute>
   );
 }

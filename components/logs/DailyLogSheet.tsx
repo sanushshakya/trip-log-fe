@@ -6,17 +6,14 @@ import html2canvas from "html2canvas";
 import { Trip, DailyLog } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 
-// Helper function to format the date string into Month, Day, Year
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
-  // Using UTC methods to avoid timezone-related date shifts
   const month = String(date.getUTCMonth() + 1).padStart(2, "0");
   const day = String(date.getUTCDate()).padStart(2, "0");
   const year = date.getUTCFullYear();
   return { month, day, year };
 };
 
-// Component to render the 24-hour duty status grid
 const DutyStatusGrid: React.FC<{ log: DailyLog }> = ({ log }) => {
   const statuses = {
     off_duty_hours: "1. Off Duty",
@@ -25,7 +22,6 @@ const DutyStatusGrid: React.FC<{ log: DailyLog }> = ({ log }) => {
     on_duty_not_driving_hours: "4. On Duty (not driving)",
   };
 
-  // Renders the vertical grid lines for each hour
   const renderGridLines = () =>
     Array.from({ length: 24 }).map((_, i) => (
       <div
@@ -34,7 +30,6 @@ const DutyStatusGrid: React.FC<{ log: DailyLog }> = ({ log }) => {
       />
     ));
 
-  // Renders a solid black line representing a period of a specific duty status
   const renderTimeline = (startHour: number, duration: number) => {
     if (!duration || duration <= 0) return null;
     return (
@@ -170,7 +165,6 @@ export const DailyLogSheet: React.FC<DailyLogSheetProps> = ({
       let newWidth = pdfWidth - margin * 2;
       let newHeight = newWidth / imgRatio;
 
-      // Fit image to page margins
       if (newHeight > pdfHeight - margin * 2) {
         newHeight = pdfHeight - margin * 2;
         newWidth = newHeight * imgRatio;
@@ -189,7 +183,6 @@ export const DailyLogSheet: React.FC<DailyLogSheetProps> = ({
         ref={logSheetRef}
         className="p-4 border-2 border-black font-sans text-xs bg-white"
       >
-        {/* Header */}
         <div className="flex justify-between items-start mb-2">
           <h1 className="text-xl font-bold">Driver's Daily Log</h1>
           <div className="text-right text-[10px]">
@@ -198,7 +191,6 @@ export const DailyLogSheet: React.FC<DailyLogSheetProps> = ({
           </div>
         </div>
 
-        {/* Sub-header with trip details */}
         <div className="flex justify-between items-center mb-2">
           <div className="flex space-x-2 items-center">
             <p>
@@ -225,7 +217,6 @@ export const DailyLogSheet: React.FC<DailyLogSheetProps> = ({
           </Button>
         </div>
 
-        {/* Vehicle and Carrier Info */}
         <div className="grid grid-cols-3 gap-x-4 border-y border-gray-400 py-1 mb-4">
           <div className="border-r border-gray-400 pr-2 space-y-1">
             <p>
@@ -250,10 +241,8 @@ export const DailyLogSheet: React.FC<DailyLogSheetProps> = ({
           </div>
         </div>
 
-        {/* The 24-hour grid */}
         <DutyStatusGrid log={dailyLog} />
 
-        {/* Remarks and Recap */}
         <div className="grid grid-cols-3 gap-x-8 mt-2">
           <div className="col-span-2">
             <p className="font-bold">Remarks:</p>
