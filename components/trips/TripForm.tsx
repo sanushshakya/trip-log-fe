@@ -103,24 +103,6 @@ export const TripForm: React.FC<TripFormProps> = ({
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="current_cycle_used">Current Cycle Used (Hrs)</Label>
-            <Input
-              id="current_cycle_used"
-              type="number"
-              step="0.1"
-              value={formData.current_cycle_hours_used}
-              onChange={(e) =>
-                handleChange(
-                  "current_cycle_hours_used",
-                  parseFloat(e.target.value)
-                )
-              }
-              required
-              disabled={loading}
-            />
-          </div>
-
           <div className="flex justify-end pt-4">
             <Button type="submit" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
